@@ -11,8 +11,20 @@ import { Box } from '@mui/system';
 import { Grid, Card, CardHeader, CardMedia, CardActions, Typography, IconButton } from '@mui/material';
 import { Alert } from '@mui/material';
 
-const tigerToGnosis = async (tokenId, contract, account) => {
-  console.log(account)
+const setApproval = async (tigerContract, gnosisContract, account) => {
+  try {
+    // await tigersContract.methods.approve(TRANSFORMER_ADDR, tokenId).send({"from": account});
+    await tigerContract.methods.setApprovalForAll(TRANSFORMER_ADDR, true).send({'from': account});
+    await gnosisContract.methods.setApprovalForAll(TRANSFORMER_ADDR, true).send({'from': account});
+    alert("Successfully approved!");
+  }
+  catch(error){
+    console.log(error)
+    alert("Transformation Failed")
+  }
+}
+
+const tigerToGnosis = async (tokenId, contract,  account) => {
   try {
     await contract.methods.Nft2DTo3D(tokenId).send({ 'from': account }).then((txnHash) => {
       console.log(txnHash)
@@ -33,12 +45,10 @@ const gnosisToTiger = async (tokenId, contract, account) => {
       .then((txnHash) => {
         console.log(txnHash);
         alert("Transformation successful!")
-        // return <Alert severity='success' onClose={() => {}}>Transformation successful!</Alert>
       });
     } catch (error) {
       console.log(error)
       alert("Transformation Failed")
-      // return <Alert severity='error' onClose={() => {}}>Transformation failed</Alert>
     }
     window.location.reload(false)
 }
@@ -61,18 +71,22 @@ const NFTGrid = (props) => {
             tokenId={tokenId}
             key={tokenId}
             account={props.account}
+            tigersContract={props.tigersContract}
+            gnosisContract={props.gnosisContract}
           ></NFT>
         </Grid>
       })}
       {props.wallet.GnosisTigers.map((tokenId) => {
         return <Grid item xs={4}>
           <NFT
-            contract={props.gnosisTigersContract}
+            contract={props.gnosisContract}
             transformerContract={props.transformerContract}
             type="Gnosis"
             tokenId={tokenId}
             key={tokenId}
             account={props.account}
+            tigersContract={props.tigersContract}
+            gnosisContract={props.gnosisContract}
           ></NFT>
         </Grid>
       })}
@@ -122,7 +136,10 @@ const NFT = (props) => {
         loading='lazy'
       />
       <CardActions disableSpacing>
-          <Button sx={{background: "#001428"}} variant="contained" size='small' onClick={() => props.type == "Tiger" ? tigerToGnosis(props.tokenId, props.transformerContract, props.account) : gnosisToTiger(props.tokenId, props.transformerContract, props.account)}>Transform</Button>
+          <Button sx={{background: "#001428"}} variant="contained" size='small' onClick={async() => {
+            await setApproval(props.tigersContract, props.gnosisContract, props.account)
+            props.type == "Tiger" ? tigerToGnosis(props.tokenId, props.transformerContract, props.account) : gnosisToTiger(props.tokenId, props.transformerContract, props.account)
+          }}>Transform</Button>
       </CardActions>
     </Card>
     : <h3>Loading NFT</h3>
@@ -175,7 +192,7 @@ function App() {
           <NFTGrid
             wallet={userWallet}
             tigersContract={NFT2D}
-            gnosisTigersContract={NFT3D}
+            gnosisContract={NFT3D}
             account={account}
             transformerContract={TRANSFORMER}
           ></NFTGrid>
