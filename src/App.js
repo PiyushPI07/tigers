@@ -14,9 +14,16 @@ import { Alert } from '@mui/material';
 const setApproval = async (tigerContract, gnosisContract, account) => {
   try {
     // await tigersContract.methods.approve(TRANSFORMER_ADDR, tokenId).send({"from": account});
-    await tigerContract.methods.setApprovalForAll(TRANSFORMER_ADDR, true).send({'from': account});
-    await gnosisContract.methods.setApprovalForAll(TRANSFORMER_ADDR, true).send({'from': account});
-    alert("Successfully approved!");
+    const isApprovedTiger = tigerContract.methods.isApprovedForAll(account, TRANSFORMER_ADDR).call();
+    const isApprovedGnosis = gnosisContract.methods.isApprovedForAll(account, TRANSFORMER_ADDR).call();
+    if (!isApprovedTiger) {
+      await tigerContract.methods.setApprovalForAll(TRANSFORMER_ADDR, true).send({'from': account});
+      alert("Successfully approved!");
+    }
+    if (!isApprovedGnosis){
+      await gnosisContract.methods.setApprovalForAll(TRANSFORMER_ADDR, true).send({'from': account});
+      alert("Successfully approved!");
+    }
   }
   catch(error){
     console.log(error)
