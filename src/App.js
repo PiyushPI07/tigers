@@ -125,14 +125,16 @@ const NFT = (props) => {
     <Card
       variant="outlined"
       sx={{
-        background: "#E8E7E6",
+        background: "#5D8E4D",
         height: 420,
         width: 300,
-        boxShadow: 5,
+        boxShadow: 3,
+        // border: 2,
         borderRadius: 5,
+        // borderColor: '#0D2320',
         '&:hover': {
-          backgroundColor: '#E8E7E6',
-          opacity: [0.9, 0.8, 0.7],
+          backgroundColor: '#75A791',
+          // opacity: [0.9, 0.8, 0.9],
         },
       }}>
       <CardHeader title={`#${props.tokenId}`}></CardHeader>
@@ -143,8 +145,8 @@ const NFT = (props) => {
         alt={`xDaiTigers #${props.tokenId}`}
         loading='lazy'
       />
-      <CardActions disableSpacing>
-        <Button sx={{ background: "#001428" }} variant="contained" size='small' onClick={async () => {
+      <CardActions sx={{justifyContent: 'center'}} disableSpacing>
+        <Button sx={{ background: "#0D2320" }} variant="contained" size='small' onClick={async () => {
           try {
             await setApproval(props.tigersContract, props.gnosisContract, props.account)
             props.type == "Tiger" ? tigerToGnosis(props.tokenId, props.transformerContract, props.account) : gnosisToTiger(props.tokenId, props.transformerContract, props.account)
@@ -202,7 +204,7 @@ function App() {
       // background: "#001428"
     }}>
       <Box id='appBar'>
-        <AppBar position="static" sx={{ background: "#001428", boxShadow: 5 }}>
+        <AppBar position="static" sx={{ background: "#0D2320", boxShadow: 5 }}>
           <Toolbar>
             <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
               xDaiTigers
