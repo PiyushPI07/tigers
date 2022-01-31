@@ -163,7 +163,17 @@ function App() {
   const [TRANSFORMER, setTRANSFORMER] = useState();
   const [userWallet, setUserWallet] = useState();
 
+  
   useEffect(() => {
+    if(window.ethereum) {
+      window.ethereum.on('chainChanged', () => {
+        window.location.reload();
+      })
+      window.ethereum.on('accountsChanged', () => {
+        window.location.reload();
+      })
+    }
+
     async function load() {
       const web3 = new Web3(Web3.givenProvider || 'http://localhost:7545');
       const accounts = await web3.eth.requestAccounts();
@@ -173,7 +183,7 @@ function App() {
       const NFT2D = new web3.eth.Contract(NFT_ABI, NFT_ADDR);
       const NFT3D = new web3.eth.Contract(NFT3D_ABI, NFT3D_ADDR);
       const TRANSFORMER = new web3.eth.Contract(TRANSFORMER_ABI, TRANSFORMER_ADDR);
-
+      
       setNFT2D(NFT2D);
       setNFT3D(NFT3D);
       setTRANSFORMER(TRANSFORMER);
@@ -182,6 +192,7 @@ function App() {
         GnosisTigers: await NFT3D.methods.walletOfOwner(account).call()
       }
       setUserWallet(userWallet);
+      
     }
     load();
   }, [account]);
