@@ -12,52 +12,53 @@ import { Grid, Card, CardHeader, CardMedia, CardActions, Typography, IconButton 
 import { Alert } from '@mui/material';
 
 const setApproval = async (tigerContract, gnosisContract, account) => {
-  try {
+  // try {
     // await tigersContract.methods.approve(TRANSFORMER_ADDR, tokenId).send({"from": account});
-    const isApprovedTiger = tigerContract.methods.isApprovedForAll(account, TRANSFORMER_ADDR).call();
-    const isApprovedGnosis = gnosisContract.methods.isApprovedForAll(account, TRANSFORMER_ADDR).call();
+    const isApprovedTiger = await tigerContract.methods.isApprovedForAll(account, TRANSFORMER_ADDR).call();
+    const isApprovedGnosis = await gnosisContract.methods.isApprovedForAll(account, TRANSFORMER_ADDR).call();
+    console.log(isApprovedTiger, isApprovedGnosis);
     if (!isApprovedTiger) {
-      await tigerContract.methods.setApprovalForAll(TRANSFORMER_ADDR, true).send({'from': account});
+      await tigerContract.methods.setApprovalForAll(TRANSFORMER_ADDR, true).send({ 'from': account });
       alert("Successfully approved!");
     }
-    if (!isApprovedGnosis){
-      await gnosisContract.methods.setApprovalForAll(TRANSFORMER_ADDR, true).send({'from': account});
+    if (!isApprovedGnosis) {
+      await gnosisContract.methods.setApprovalForAll(TRANSFORMER_ADDR, true).send({ 'from': account });
       alert("Successfully approved!");
     }
-  }
-  catch(error){
-    console.log(error)
-    alert("Transformation Failed")
-  }
+  // }
+  // catch (error) {
+  //   console.log(error)
+  //   alert(`Could not set approval, ${error.message}`)
+  // }
 }
 
-const tigerToGnosis = async (tokenId, contract,  account) => {
-  try {
+const tigerToGnosis = async (tokenId, contract, account) => {
+  // try {
     await contract.methods.Nft2DTo3D(tokenId).send({ 'from': account }).then((txnHash) => {
       console.log(txnHash)
       alert("Transformation successful!")
-      return <Alert severity='success' onClose={() => {}}>Transformation successful!</Alert>
+      return <Alert severity='success' onClose={() => { }}>Transformation successful!</Alert>
     });
-  } catch (error) {
-    console.log(error)
-    alert("Transformation Failed")
-    return <Alert severity='error' onClose={() => {}}>Transformation failed</Alert>
-  }
+  // } catch (error) {
+  //   console.log(error)
+  //   alert("Transformation Failed")
+  //   return <Alert severity='error' onClose={() => { }}>Transformation failed</Alert>
+  // }
   window.location.reload(false)
 }
 
 const gnosisToTiger = async (tokenId, contract, account) => {
-  try {
+  // try {
     await contract.methods.Nft3DTo2D(tokenId).send({ 'from': account })
       .then((txnHash) => {
         console.log(txnHash);
         alert("Transformation successful!")
       });
-    } catch (error) {
-      console.log(error)
-      alert("Transformation Failed")
-    }
-    window.location.reload(false)
+  // } catch (error) {
+  //   console.log(error)
+  //   alert("Transformation Failed")
+  // }
+  window.location.reload(false)
 }
 
 const NFTGrid = (props) => {
@@ -143,10 +144,14 @@ const NFT = (props) => {
         loading='lazy'
       />
       <CardActions disableSpacing>
-          <Button sx={{background: "#001428"}} variant="contained" size='small' onClick={async() => {
+        <Button sx={{ background: "#001428" }} variant="contained" size='small' onClick={async () => {
+          try {
             await setApproval(props.tigersContract, props.gnosisContract, props.account)
             props.type == "Tiger" ? tigerToGnosis(props.tokenId, props.transformerContract, props.account) : gnosisToTiger(props.tokenId, props.transformerContract, props.account)
-          }}>Transform</Button>
+          } catch (error) {
+            alert(`Transformation failure, ${error.message}`)
+          }
+        }}>Transform</Button>
       </CardActions>
     </Card>
     : <h3>Loading NFT</h3>
@@ -186,7 +191,7 @@ function App() {
       // background: "#001428"
     }}>
       <Box id='appBar'>
-        <AppBar position="static" sx={{background: "#001428", boxShadow: 5}}>
+        <AppBar position="static" sx={{ background: "#001428", boxShadow: 5 }}>
           <Toolbar>
             <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
               xDaiTigers
