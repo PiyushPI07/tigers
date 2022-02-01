@@ -113,8 +113,9 @@ const NFT = (props) => {
         method: 'GET',
         redirect: 'follow'
       };
-
-      await fetch(uri, requestOptions)
+      const ipfs_uri = `https://ipfs.io/ipfs/${uri.substring(7, )}`
+      console.log(ipfs_uri)
+      await fetch(ipfs_uri, requestOptions)
         .then(response => response.json())
         .then(result => setMetadata(result))
         .catch(error => console.log('error', error));
@@ -141,7 +142,7 @@ const NFT = (props) => {
       <CardMedia
         component="img"
         height="300"
-        image={metadata.image}
+        image={`https://ipfs.io/ipfs/${metadata.image.substring(7, )}`}
         alt={`xDaiTigers #${props.tokenId}`}
         loading='lazy'
       />
