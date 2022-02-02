@@ -85,7 +85,7 @@ const NFTGrid = (props) => {
         </Grid>
       })}
       {props.wallet.GnosisTigers.map((tokenId) => {
-        return <Grid item xs={4}>
+        return <Grid item xs={12} sm={6} md={4}>
           <NFT
             contract={props.gnosisContract}
             transformerContract={props.transformerContract}
@@ -114,6 +114,7 @@ const NFT = (props) => {
         redirect: 'follow'
       };
       const ipfs_uri = `https://ipfs.io/ipfs/${uri.substring(7, )}`
+      // const ipfs_uri = uri
       console.log(ipfs_uri)
       await fetch(ipfs_uri, requestOptions)
         .then(response => response.json())
@@ -143,6 +144,7 @@ const NFT = (props) => {
         component="img"
         height="300"
         image={`https://ipfs.io/ipfs/${metadata.image.substring(7, )}`}
+        // image={metadata.image}
         alt={`xDaiTigers #${props.tokenId}`}
         loading='lazy'
       />
