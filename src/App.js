@@ -12,6 +12,38 @@ import { Grid, Card, CardHeader, CardMedia, CardActions, Typography, IconButton 
 import { Alert } from '@mui/material';
 import { TailSpin } from 'react-loader-spinner';
 
+
+const switchNetwork = async () => {
+  if (window.ethereum) {
+    try {
+      await window.ethereum.request({
+        method: 'wallet_switchEthereumChain',
+        params: [{ chainId: '0x64' }],
+      });
+    } catch (switchError) {
+      // This error code indicates that the chain has not been added to MetaMask.
+      if (switchError.code === 4902) {
+        try {
+          await window.ethereum.request({
+            method: 'wallet_addEthereumChain',
+            params: [
+              {
+                chainId: '0x64',
+                chainName: 'Gnosis Chain',
+                rpcUrls: ['https://rpc.gnosischain.com/'] /* ... */,
+              },
+            ],
+          });
+        } catch (addError) {
+          console.log(addError)
+        }
+      }
+      // handle other "switch" errors
+      console.log(switchError);
+    }
+  }
+}
+
 const setApproval = async (tigerContract, gnosisContract, account) => {
   // try {
   // await tigersContract.methods.approve(TRANSFORMER_ADDR, tokenId).send({"from": account});
@@ -62,6 +94,11 @@ const gnosisToTiger = async (tokenId, contract, account) => {
   window.location.reload(false)
 }
 
+const Switch = (props) => {
+  return window.ethereum && window.ethereum.chainId=="0x64" 
+  ? <Typography>{window.ethereum.selectedAddress}</Typography>
+  : <Button color="inherit" onClick={switchNetwork}>Switch to Gnosis</Button>
+}
 const NFTGrid = (props) => {
   console.log(props.wallet)
   return props.wallet ? <Container>
@@ -201,37 +238,8 @@ function App() {
     async function load() {
       const web3 = new Web3(Web3.givenProvider || 'http://localhost:7545');
       const accounts = await web3.eth.requestAccounts();
-
       setAccount(accounts[0]);
-
-      if (window.ethereum) {
-        try {
-          await window.ethereum.request({
-            method: 'wallet_switchEthereumChain',
-            params: [{ chainId: '0x64' }],
-          });
-        } catch (switchError) {
-          // This error code indicates that the chain has not been added to MetaMask.
-          if (switchError.code === 4902) {
-            try {
-              await window.ethereum.request({
-                method: 'wallet_addEthereumChain',
-                params: [
-                  {
-                    chainId: '0x64',
-                    chainName: 'Gnosis Chain',
-                    rpcUrls: ['https://rpc.gnosischain.com/'] /* ... */,
-                  },
-                ],
-              });
-            } catch (addError) {
-              console.log(addError)
-            }
-          }
-          // handle other "switch" errors
-          console.log(switchError);
-        }
-      }
+      
       const NFT2D = new web3.eth.Contract(NFT_ABI, NFT_ADDR);
       const NFT3D = new web3.eth.Contract(NFT3D_ABI, NFT3D_ADDR);
       const TRANSFORMER = new web3.eth.Contract(TRANSFORMER_ABI, TRANSFORMER_ADDR);
@@ -259,6 +267,7 @@ function App() {
             <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
               xDaiTigers
             </Typography>
+            <Switch></Switch>
           </Toolbar>
         </AppBar>
         <Container sx={{
