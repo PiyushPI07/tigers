@@ -6,25 +6,26 @@ import { TRANSFORMER_ABI, TRANSFORMER_ADDR } from './config/TRANSFORMER'
 
 import AppBar from '@mui/material/AppBar';
 import Toolbar from '@mui/material/Toolbar';
-import { Button, Container } from '@mui/material';
+import { Button, CardContent, Container } from '@mui/material';
 import { Box } from '@mui/system';
 import { Grid, Card, CardHeader, CardMedia, CardActions, Typography, IconButton } from '@mui/material';
 import { Alert } from '@mui/material';
+import { TailSpin } from 'react-loader-spinner';
 
 const setApproval = async (tigerContract, gnosisContract, account) => {
   // try {
-    // await tigersContract.methods.approve(TRANSFORMER_ADDR, tokenId).send({"from": account});
-    const isApprovedTiger = await tigerContract.methods.isApprovedForAll(account, TRANSFORMER_ADDR).call();
-    const isApprovedGnosis = await gnosisContract.methods.isApprovedForAll(account, TRANSFORMER_ADDR).call();
-    console.log(isApprovedTiger, isApprovedGnosis);
-    if (!isApprovedTiger) {
-      await tigerContract.methods.setApprovalForAll(TRANSFORMER_ADDR, true).send({ 'from': account });
-      alert("Successfully approved!");
-    }
-    if (!isApprovedGnosis) {
-      await gnosisContract.methods.setApprovalForAll(TRANSFORMER_ADDR, true).send({ 'from': account });
-      alert("Successfully approved!");
-    }
+  // await tigersContract.methods.approve(TRANSFORMER_ADDR, tokenId).send({"from": account});
+  const isApprovedTiger = await tigerContract.methods.isApprovedForAll(account, TRANSFORMER_ADDR).call();
+  const isApprovedGnosis = await gnosisContract.methods.isApprovedForAll(account, TRANSFORMER_ADDR).call();
+  console.log(isApprovedTiger, isApprovedGnosis);
+  if (!isApprovedTiger) {
+    await tigerContract.methods.setApprovalForAll(TRANSFORMER_ADDR, true).send({ 'from': account });
+    alert("Successfully approved!");
+  }
+  if (!isApprovedGnosis) {
+    await gnosisContract.methods.setApprovalForAll(TRANSFORMER_ADDR, true).send({ 'from': account });
+    alert("Successfully approved!");
+  }
   // }
   // catch (error) {
   //   console.log(error)
@@ -34,11 +35,11 @@ const setApproval = async (tigerContract, gnosisContract, account) => {
 
 const tigerToGnosis = async (tokenId, contract, account) => {
   // try {
-    await contract.methods.Nft2DTo3D(tokenId).send({ 'from': account }).then((txnHash) => {
-      console.log(txnHash)
-      alert("Transformation successful!")
-      return <Alert severity='success' onClose={() => { }}>Transformation successful!</Alert>
-    });
+  await contract.methods.Nft2DTo3D(tokenId).send({ 'from': account }).then((txnHash) => {
+    console.log(txnHash)
+    alert("Transformation successful!")
+    return <Alert severity='success' onClose={() => { }}>Transformation successful!</Alert>
+  });
   // } catch (error) {
   //   console.log(error)
   //   alert("Transformation Failed")
@@ -49,11 +50,11 @@ const tigerToGnosis = async (tokenId, contract, account) => {
 
 const gnosisToTiger = async (tokenId, contract, account) => {
   // try {
-    await contract.methods.Nft3DTo2D(tokenId).send({ 'from': account })
-      .then((txnHash) => {
-        console.log(txnHash);
-        alert("Transformation successful!")
-      });
+  await contract.methods.Nft3DTo2D(tokenId).send({ 'from': account })
+    .then((txnHash) => {
+      console.log(txnHash);
+      alert("Transformation successful!")
+    });
   // } catch (error) {
   //   console.log(error)
   //   alert("Transformation Failed")
@@ -99,7 +100,7 @@ const NFTGrid = (props) => {
         </Grid>
       })}
     </Grid>
-  </Container> : <h1>waiting</h1>
+  </Container> : <TailSpin color="#ffffff" height={80} width={80} />
 }
 
 const NFT = (props) => {
@@ -113,7 +114,7 @@ const NFT = (props) => {
         method: 'GET',
         redirect: 'follow'
       };
-      const ipfs_uri = `https://ipfs.io/ipfs/${uri.substring(7, )}`
+      const ipfs_uri = `https://ipfs.io/ipfs/${uri.substring(7,)}`
       // const ipfs_uri = uri
       console.log(ipfs_uri)
       await fetch(ipfs_uri, requestOptions)
@@ -143,12 +144,12 @@ const NFT = (props) => {
       <CardMedia
         component="img"
         height="300"
-        image={`https://ipfs.io/ipfs/${metadata.image.substring(7, )}`}
+        image={`https://ipfs.io/ipfs/${metadata.image.substring(7,)}`}
         // image={metadata.image}
         alt={`xDaiTigers #${props.tokenId}`}
         loading='lazy'
       />
-      <CardActions sx={{justifyContent: 'center'}} disableSpacing>
+      <CardActions sx={{ justifyContent: 'center' }} disableSpacing>
         <Button sx={{ background: "#0D2320" }} variant="contained" size='small' onClick={async () => {
           try {
             await setApproval(props.tigersContract, props.gnosisContract, props.account)
@@ -159,7 +160,25 @@ const NFT = (props) => {
         }}>Transform</Button>
       </CardActions>
     </Card>
-    : <h3>Loading NFT</h3>
+    : <Card
+      variant="outlined"
+      sx={{
+        background: "#5D8E4D",
+        height: 420,
+        width: 300,
+        boxShadow: 3,
+        // border: 2,
+        borderRadius: 5,
+        // borderColor: '#0D2320',
+        '&:hover': {
+          backgroundColor: '#75A791',
+          // opacity: [0.9, 0.8, 0.9],
+        },
+      }}>
+      <CardActions sx={{ justifyContent: 'center', alignItems: 'center', marginTop: '50%' }}>
+        <TailSpin color="#ffffff" height={80} width={80} />
+      </CardActions>
+    </Card>
 }
 function App() {
   const [account, setAccount] = useState(); // state variable to set account.
@@ -168,9 +187,9 @@ function App() {
   const [TRANSFORMER, setTRANSFORMER] = useState();
   const [userWallet, setUserWallet] = useState();
 
-  
+
   useEffect(() => {
-    if(window.ethereum) {
+    if (window.ethereum) {
       window.ethereum.on('chainChanged', () => {
         window.location.reload();
       })
@@ -185,10 +204,38 @@ function App() {
 
       setAccount(accounts[0]);
 
+      if (window.ethereum) {
+        try {
+          await window.ethereum.request({
+            method: 'wallet_switchEthereumChain',
+            params: [{ chainId: '0x64' }],
+          });
+        } catch (switchError) {
+          // This error code indicates that the chain has not been added to MetaMask.
+          if (switchError.code === 4902) {
+            try {
+              await window.ethereum.request({
+                method: 'wallet_addEthereumChain',
+                params: [
+                  {
+                    chainId: '0x64',
+                    chainName: 'Gnosis Chain',
+                    rpcUrls: ['https://rpc.gnosischain.com/'] /* ... */,
+                  },
+                ],
+              });
+            } catch (addError) {
+              console.log(addError)
+            }
+          }
+          // handle other "switch" errors
+          console.log(switchError);
+        }
+      }
       const NFT2D = new web3.eth.Contract(NFT_ABI, NFT_ADDR);
       const NFT3D = new web3.eth.Contract(NFT3D_ABI, NFT3D_ADDR);
       const TRANSFORMER = new web3.eth.Contract(TRANSFORMER_ABI, TRANSFORMER_ADDR);
-      
+
       setNFT2D(NFT2D);
       setNFT3D(NFT3D);
       setTRANSFORMER(TRANSFORMER);
@@ -197,7 +244,7 @@ function App() {
         GnosisTigers: await NFT3D.methods.walletOfOwner(account).call()
       }
       setUserWallet(userWallet);
-      
+
     }
     load();
   }, [account]);
